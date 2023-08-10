@@ -37,7 +37,8 @@ helper(){
     if [ $# -eq 1 ]; then
         case "$1" in
         add) 
-            echo "${RED}${BOLD}Usage : sh-rem add <message> [importance default=3]${RESET}";;
+            default_value=$(yq '.default' $FILE_NAME)
+            echo "${RED}${BOLD}Usage : sh-rem add <message> [importance default=${default_value}]${RESET}";;
         list)
             echo "${RED}${BOLD}Usage : sh-rem list [importance]${RESET}";;
         del)
@@ -68,7 +69,6 @@ helper(){
     fi;
     exit
 }
-
 
 case "$1" in
 add) 
