@@ -14,11 +14,11 @@ UNCHECKED='\u2610'
 
 FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
 
-# Work but - problem sometimes
 addValue(){ # Message  [Importance] default 3
     new_uuid=$(uuidgen)
     if [ $# -eq 1 ]; then
-        yq eval ".I3 += [{\"$new_uuid\": {\"$1\"}]" $FILE_NAME -i
+        default_value=$(yq '.default' $FILE_NAME)
+        yq eval ".I$default_value += [{\"$new_uuid\": {\"$1\"}]" $FILE_NAME -i
     else
         yq eval ".I$2 += [{\"$new_uuid\": \"$1\"}]" $FILE_NAME -i
     fi;
@@ -33,7 +33,39 @@ printValues(){
 }
 
 helper(){
-    echo "TODO"
+    
+    if [ $# -eq 1 ]; then
+        case "$1" in
+        add) 
+            echo "${RED}${BOLD}Usage : sh-rem add <message> [importance default=3]${RESET}";;
+        list)
+            echo "${RED}${BOLD}Usage : sh-rem list [importance]${RESET}";;
+        del)
+            echo "${RED}${BOLD}Usage : sh-rem del <uuid>${RESET}";;
+        prune)
+            echo "${RED}${BOLD}Usage : sh-rem prune [importance]${RESET}";;
+        modify)
+            echo "${RED}${BOLD}Usage : sh-rem modify <uuid> [-i <importance>] [-m <message>]${RESET}";;
+        config)
+            echo "${RED}${BOLD}Usage : sh-rem config <tag=value>${RESET}";;
+        link)
+            echo "${RED}${BOLD}Usage : sh-rem link <filepath>${RESET}";;
+        check)
+            echo "${RED}${BOLD}Usage : sh-rem check <uuid>${RESET}";;
+        *) 
+            helper;;
+        esac
+    else
+        echo "add : Add value to the reminder with the wanted message and importance, if importance is not specified it will use the default value visible in the file"
+        echo "list : List all the remiders or just the one from the specified importance"
+        echo "del : Delete the remider with the specified uuid"
+        echo "prune : Delete all the checked remiders from any or the specified importance"
+        echo "modify : Modify the remider with the specified uuid using those options : -m <message> and -i <importance>"
+        echo "check : Check the remider with the specified uuid"
+        echo "link : Change the file to the one specified (NOT RECOMMENDED)"
+        echo "config : Change the value of some of the main tags like : show to change the visibilty of list or the default value"
+        echo "help : Show the helper"
+    fi;
     exit
 }
 
@@ -59,14 +91,14 @@ list)
     else
         helper "list"
     fi;;
-check) echo "TODO";;
-prune) echo "TODO";;
-del) echo "TODO";;
-prune) echo "TODO";;
-config) echo "TODO";;
-modify) echo "TODO";;
-link) echo "TODO";;
-help) helper "help";;
+check) helper "check";;
+prune) helper "prune";;
+del) helper "del";;
+config) helper "config";;
+modify) helper "modify";;
+link) helper "link";;
+help) helper;;
+*) helper;;
 esac
 
 
