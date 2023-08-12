@@ -18,7 +18,28 @@ ARROW='\u2192'
 FILE_NAME="$HOME/.sh-rem-data.yaml"
 
 checkRemider(){
-    echo "TODO"
+    
+    max_value=$(yq '.importance_number' $FILE_NAME)
+    for i in {1..$max_value}; do
+        uuids=$(yq ".I${i}[] | keys | .[]" "$FILE_NAME")
+        checked=$(yq eval ".I${i}[].[][][]" "$FILE_NAME")
+
+        for j in {1..$(wc -l <<< $uuids)}; do
+                ISCHECKED=$(sed -n "${j}p" <<< $checked)
+                ISUUID=$(sed -n "${j}p" <<< $uuids)
+
+                if [ "$ISUUID" = "$1" ]; then
+                    if [ "$ISCHECKED" = "false" ]; then
+                        yq eval ".I${i}[$((j-1))].[][1].checked |= true" $FILE_NAME -i
+                        break;
+                    else
+                        yq eval ".I${i}[$((j-1))].[][1].checked |= false" $FILE_NAME -i
+                        break;
+                    fi;
+                fi;
+        done
+    done
+
 }
 
 initStorageFile(){
