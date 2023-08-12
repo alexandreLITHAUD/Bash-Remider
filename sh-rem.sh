@@ -144,7 +144,6 @@ helper(){
 if ! [ -e "$FILE_NAME" ]; then
     echo "${RED}${BOLD}FILE NOT FOUND : ${RESET}FILE INITIALIZATION"
     initStorageFile
-    exit
 fi;
 
 case "$1" in
