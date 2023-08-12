@@ -14,12 +14,15 @@ UNCHECKED='\u2610'
 
 ARROW='\u2192'
 
-FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
-# FILE_NAME='~/.sh-rem-data.yaml'
+# FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
+FILE_NAME="$HOME/.sh-rem-data.yaml"
+
+checkRemider(){
+    echo "TODO"
+}
 
 initStorageFile(){
-
-    touch ~/.sh-rem-data.yaml
+    touch "$FILE_NAME"
     echo "show: true
 default: 3
 importance_number: 5
@@ -27,7 +30,7 @@ I1:
 I2:
 I3:
 I4:
-I5:" > ~/.sh-rem-data.yaml
+I5:" > $FILE_NAME
 }
 
 addValue(){ # Message  [Importance] default 3
@@ -119,7 +122,7 @@ helper(){
         check)
             echo "${RED}${BOLD}Usage : sh-rem check <uuid>${RESET}";;
         init)
-            echo "${RED}${BOLD}Usage: sh-rem init${RESET}";;
+            echo "${RED}${BOLD}Usage: sh-rem init${RESET} -> Necessary in order to use the program";;
         *) 
             helper;;
         esac
@@ -137,6 +140,12 @@ helper(){
     fi;
     exit
 }
+
+if ! [ -e "$FILE_NAME" ]; then
+    echo "${RED}${BOLD}FILE NOT FOUND : ${RESET}FILE INITIALIZATION"
+    initStorageFile
+    exit
+fi;
 
 case "$1" in
 add) 
@@ -159,7 +168,12 @@ list)
     else
         helper "list"
     fi;;
-check) helper "check";;
+check)
+    if [ $# -eq 2 ]; then
+        checkRemider $2
+    else
+        helper "check"
+    fi;;
 prune) helper "prune";;
 del) helper "del";;
 config) helper "config";;
