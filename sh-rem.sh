@@ -15,6 +15,20 @@ UNCHECKED='\u2610'
 ARROW='\u2192'
 
 FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
+# FILE_NAME='~/.sh-rem-data.yaml'
+
+initStorageFile(){
+
+    touch ~/.sh-rem-data.yaml
+    echo "show: true
+default: 3
+importance_number: 5
+I1:
+I2:
+I3:
+I4:
+I5:" > ~/.sh-rem-data.yaml
+}
 
 addValue(){ # Message  [Importance] default 3
     new_uuid=$(uuidgen)
@@ -105,7 +119,7 @@ helper(){
         check)
             echo "${RED}${BOLD}Usage : sh-rem check <uuid>${RESET}";;
         init)
-            echo "${RED}${BOLD}Usage: sh-rem init";;
+            echo "${RED}${BOLD}Usage: sh-rem init${RESET}";;
         *) 
             helper;;
         esac
@@ -151,7 +165,12 @@ del) helper "del";;
 config) helper "config";;
 modify) helper "modify";;
 link) helper "link";;
-init) helper "init";;
+init) 
+    if [ $# -eq 1 ]; then
+        initStorageFile
+    else
+        helper "init"
+    fi;;
 help) helper;;
 *) helper;;
 esac
