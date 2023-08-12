@@ -12,24 +12,75 @@ RESET='\033[0m'     # Reset formatting
 CHECKED='\u2611'
 UNCHECKED='\u2610'
 
+ARROW='\u2192'
+
 FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
 
 addValue(){ # Message  [Importance] default 3
     new_uuid=$(uuidgen)
     if [ $# -eq 1 ]; then
         default_value=$(yq '.default' $FILE_NAME)
-        yq eval ".I$default_value += [{\"$new_uuid\": {\"$1\"}]" $FILE_NAME -i
+        yq eval ".I$default_value += [{\"$new_uuid\": [\"$1\",{\"checked\": false}]}]" $FILE_NAME -i
     else
-        yq eval ".I$2 += [{\"$new_uuid\": \"$1\"}]" $FILE_NAME -i
+        yq eval ".I$2 += [{\"$new_uuid\": [\"$1\",{\"checked\": false}]}]" $FILE_NAME -i
     fi;
 }
 
 printValues(){
-    echo "on fait des test ici !!"
 
-    # PRINT I1 FIRST (CHECK BEFORE UNCHECKED)
-    # PRINT IN FIRST (CHECK BEFORE UNCHECKED)
-    # PRINT IN+1 FIRST (CHECK BEFORE UNCHECKED)
+    if [ $# -eq 1 ]; then
+        #GREP SPECIFIC IMPORTANCE
+
+        uuids=$(yq ".I${1}[] | keys | .[]" "$FILE_NAME")
+        values=$(yq eval ".I${1}[].[][0]" "$FILE_NAME")
+        checked=$(yq eval ".I${1}[].[][][]" "$FILE_NAME")  
+
+        echo "${RED}${REVERSE} REMIDER LVL${1} : ${RESET}"
+
+        for j in {1..$(wc -l <<< $uuids)}; do
+
+            ISCHECKED=$(sed -n "${j}p" <<< $checked)
+            ISVALUE=$(sed -n "${j}p" <<< $values)
+            ISUUID=$(sed -n "${j}p" <<< $uuids)
+
+            if [ "$ISCHECKED" = "false" ]; then
+                echo "${YELLOW} ${UNCHECKED} - ${ISVALUE} ${RESET} ${ARROW} ${ISUUID}"
+            else
+                echo "${YELLOW} ${CHECKED} - ${ISVALUE} ${RESET} ${ARROW} ${ISUUID}"
+            fi;
+        done
+        echo ""   
+
+    else
+        #GREP ALL IMPORTANCES
+        max_value=$(yq '.importance_number' $FILE_NAME)
+        for i in {1..$max_value}; do
+            uuids=$(yq ".I${i}[] | keys | .[]" "$FILE_NAME")
+            values=$(yq eval ".I${i}[].[][0]" "$FILE_NAME")
+            checked=$(yq eval ".I${i}[].[][][]" "$FILE_NAME")
+
+            if [ "$uuids" = "" ]; then
+                continue;
+            fi;
+        
+            echo "${RED}${REVERSE} REMIDER LVL${i} : ${RESET}"
+
+            for j in {1..$(wc -l <<< $uuids)}; do
+
+                ISCHECKED=$(sed -n "${j}p" <<< $checked)
+                ISVALUE=$(sed -n "${j}p" <<< $values)
+                ISUUID=$(sed -n "${j}p" <<< $uuids)
+
+                if [ "$ISCHECKED" = "false" ]; then
+                    echo "${YELLOW} ${UNCHECKED} - ${ISVALUE} ${RESET} ${ARROW} ${ISUUID}"
+                else
+                    echo "${YELLOW} ${CHECKED} - ${ISVALUE} ${RESET} ${ARROW} ${ISUUID}"
+                fi;
+            done
+            echo ""
+        done
+    fi; 
+
 }
 
 helper(){
@@ -53,6 +104,8 @@ helper(){
             echo "${RED}${BOLD}Usage : sh-rem link <filepath>${RESET}";;
         check)
             echo "${RED}${BOLD}Usage : sh-rem check <uuid>${RESET}";;
+        init)
+            echo "${RED}${BOLD}Usage: sh-rem init";;
         *) 
             helper;;
         esac
@@ -65,6 +118,7 @@ helper(){
         echo "check : Check the remider with the specified uuid"
         echo "link : Change the file to the one specified (NOT RECOMMENDED)"
         echo "config : Change the value of some of the main tags like : show to change the visibilty of list or the default value"
+        echo "init : Initialize a good storage file"
         echo "help : Show the helper"
     fi;
     exit
@@ -97,17 +151,10 @@ del) helper "del";;
 config) helper "config";;
 modify) helper "modify";;
 link) helper "link";;
+init) helper "init";;
 help) helper;;
 *) helper;;
 esac
 
 
 exit
-
-# echo -e "${BOLD}This text is bold.${RESET}"
-# echo -e "${UNDERLINE}This text is underlined.${RESET}"
-# echo -e "${REVERSE}This text has reverse colors.${RESET}"
-
-# echo -e "${RED}${BOLD}This is red text.${RESET}"
-# echo -e "${GREEN}This is green text.${RESET}"
-# echo -e "${YELLOW}This is yellow text.${RESET}"
