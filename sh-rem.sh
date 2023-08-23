@@ -17,6 +17,20 @@ ARROW='\u2192'
 # FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
 FILE_NAME="$HOME/.sh-rem-data.yaml"
 
+delValue(){
+
+    max_value=$(yq '.importance_number' $FILE_NAME)
+    for i in {1..$max_value}; do
+        uuids=$(yq ".I${i}[] | keys | .[]" "$FILE_NAME")
+        for j in {1..$(wc -l <<< $uuids)}; do
+                ISUUID=$(sed -n "${j}p" <<< $uuids)
+                if [ "$ISUUID" = "$1" ]; then
+                    yq eval "del(.I${i}[${j}])"
+                fi;
+        done
+    done
+}
+
 checkRemider(){
     
     max_value=$(yq '.importance_number' $FILE_NAME)
@@ -196,7 +210,12 @@ check)
         helper "check"
     fi;;
 prune) helper "prune";;
-del) helper "del";;
+del)
+    if [ $# -eq 2 ]; then
+        delValue $2
+    else
+        helper "del"
+    fi;;
 config) helper "config";;
 modify) helper "modify";;
 link) helper "link";;
