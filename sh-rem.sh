@@ -25,7 +25,7 @@ delValue(){
         for j in {1..$(wc -l <<< $uuids)}; do
                 ISUUID=$(sed -n "${j}p" <<< $uuids)
                 if [ "$ISUUID" = "$1" ]; then
-                    yq eval "del(.I${i}[${j}])"
+                    yq eval "del(.I${i}[${j}])" $FILE_NAME -i
                 fi;
         done
     done
