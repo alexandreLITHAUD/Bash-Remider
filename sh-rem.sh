@@ -18,8 +18,20 @@ ARROW='\u2192'
 FILE_NAME="$HOME/.sh-rem-data.yaml"
 
 changeMessage(){
-    echo "went here (message)"
-    echo "$1 $2"
+
+
+    max_value=$(yq '.importance_number' $FILE_NAME)
+    for i in {1..$max_value}; do
+        uuids=$(yq ".I${i}[] | keys | .[]" "$FILE_NAME")
+
+        for j in {1..$(wc -l <<< $uuids)}; do
+                ISUUID=$(sed -n "${j}p" <<< $uuids)
+
+                if [ "$ISUUID" = "$1" ]; then
+                    yq eval ".I${i}[$((j-1))].[][0] |= \"${2}\"" $FILE_NAME -i
+                fi;
+        done
+    done
 }
 
 changeImportance(){
