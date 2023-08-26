@@ -17,6 +17,16 @@ ARROW='\u2192'
 # FILE_NAME='.sh-rem-data.yaml' #default .sh-rem-data.yaml
 FILE_NAME="$HOME/.sh-rem-data.yaml"
 
+changeMessage(){
+    echo "went here (message)"
+    echo "$1 $2"
+}
+
+changeImportance(){
+    echo "went here (importance)"
+    echo "$1 $2"
+}
+
 delValue(){
 
     max_value=$(yq '.importance_number' $FILE_NAME)
@@ -217,7 +227,27 @@ del)
         helper "del"
     fi;;
 config) helper "config";;
-modify) helper "modify";;
+modify)
+    if [ $# -ge 4 ]; then
+        if [ "$3" = "-m" ]; then
+            changeMessage $2 $4
+        elif [ "$3" = "-i" ]; then
+            changeImportance $2 $4
+        else
+            helper "modify"
+        fi;
+    else
+        helper "modify"
+    fi;
+    if [ $# -eq 6 ]; then
+        if [ "$5" = "-m" ]; then
+            changeMessage $2 $6
+        elif [ "$5" = "-i" ]; then
+            changeImportance $2 $6
+        else
+            helper "modify"
+        fi;
+    fi;;
 link) helper "link";;
 init) 
     if [ $# -eq 1 ]; then
