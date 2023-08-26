@@ -9,7 +9,6 @@
 - **prune** : Delete all the checked remiders from any or the specified importance
 - **modify** : Modify the remider with the specified uuid using those options : -m <message> and -i <importance>
 - **check** : Check the remider with the specified uuid
-- **link** : Change the file to the one specified (NOT RECOMMENDED)
 - **config** : Change the value of some of the main tags like : show to change the visibilty of list or the default value
 - **echo** "init : Initialize a good storage file"
 - **help** : Show the helper

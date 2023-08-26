@@ -162,8 +162,6 @@ helper(){
             echo "${RED}${BOLD}Usage : sh-rem modify <uuid> [-i <importance>] [-m <message>]${RESET}";;
         config)
             echo "${RED}${BOLD}Usage : sh-rem config <tag=value>${RESET}";;
-        link)
-            echo "${RED}${BOLD}Usage : sh-rem link <filepath>${RESET}";;
         check)
             echo "${RED}${BOLD}Usage : sh-rem check <uuid>${RESET}";;
         init)
@@ -178,7 +176,6 @@ helper(){
         echo "prune : Delete all the checked remiders from any or the specified importance"
         echo "modify : Modify the remider with the specified uuid using those options : -m <message> and -i <importance>"
         echo "check : Check the remider with the specified uuid"
-        echo "link : Change the file to the one specified (NOT RECOMMENDED)"
         echo "config : Change the value of some of the main tags like : show to change the visibilty of list or the default value"
         echo "init : Initialize a good storage file"
         echo "help : Show the helper"
@@ -248,7 +245,6 @@ modify)
             helper "modify"
         fi;
     fi;;
-link) helper "link";;
 init) 
     if [ $# -eq 1 ]; then
         initStorageFile
