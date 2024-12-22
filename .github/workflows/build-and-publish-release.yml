@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-upload-deb:
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     steps:
       # Checkout repository
       - name: Checkout Repository
