@@ -1,0 +1,46 @@
+name: Build and Publish bash reminder .deb on Tag creation
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-upload-deb:
+    runs-on: ubuntu-lastest
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build .deb package
+        runs: |
+          # Extract version from the TAG
+          echo "Building .deb package for version ${{ github.ref_name }}"
+          
+          # Create necessary directories
+          mkdir -p bash-reminder/DEBIAN bash-reminder/usr/bin
+
+          # Control file for the .deb package
+          cat <<EOF>> bash-reminder/DEBIAN/control
+          Package: bash-reminder
+          Version: ${{ github.ref_name }}
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Maintainer: Alexandre Lithaud
+          Description: A Bash terminal based todo list for developers
+          EOF
+
+          # Copy script
+          cp ./sh-rem.sh bash-reminder/usr/bin/bash-reminder
+          chmod +x bash-reminder/usr/bin/bash-reminder
+
+          # Build the .deb package
+          dpkg-deb --build bash-reminder
+          mv bash_reminder.deb bash-reminder_${{ github.ref_name }}.deb
+
+      - name: Create GitHub Release with binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: bash_reminder.deb bash-reminder_${{ github.ref_name }}.deb
