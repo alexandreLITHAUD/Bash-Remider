@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-upload-deb:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # This allows creating releases
     steps:
       # Checkout repository
       - name: Checkout Repository
@@ -19,6 +21,7 @@ jobs:
           # Extract version from the TAG
           echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
+      # Build the .deb package
       - name: Build .deb package
         run: |
           # Extract version from the TAG
@@ -46,7 +49,8 @@ jobs:
           dpkg-deb --build bash-reminder
           mv bash-reminder.deb bash-reminder_v${{ env.VERSION }}.deb
 
+      # Upload the .deb package to a new newly created release
       - name: Create GitHub Release with binary
         uses: softprops/action-gh-release@v2
         with:
-          files: bash_reminder.deb bash-reminder_v${{ env.VERSION }}.deb
+          files: bash-reminder_v${{ env.VERSION }}.deb
