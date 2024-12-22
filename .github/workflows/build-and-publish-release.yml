@@ -44,7 +44,7 @@ jobs:
 
           # Build the .deb package
           dpkg-deb --build bash-reminder
-          mv bash_reminder.deb bash-reminder_v${{ env.VERSION }}.deb
+          mv bash-reminder.deb bash-reminder_v${{ env.VERSION }}.deb
 
       - name: Create GitHub Release with binary
         uses: softprops/action-gh-release@v2
