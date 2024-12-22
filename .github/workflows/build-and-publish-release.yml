@@ -13,10 +13,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Parse the version from the tag
+      - name: Parse Version
+        run: |
+          # Extract version from the TAG
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
       - name: Build .deb package
         run: |
           # Extract version from the TAG
-          echo "Building .deb package for version ${{ github.ref_name }}"
+          echo "Building .deb package for version ${{ env.VERSION }}"
           
           # Create necessary directories
           mkdir -p bash-reminder/DEBIAN bash-reminder/usr/bin
@@ -24,7 +30,7 @@ jobs:
           # Control file for the .deb package
           cat <<EOF>> bash-reminder/DEBIAN/control
           Package: bash-reminder
-          Version: ${{ github.ref_name }}
+          Version: ${{ env.VERSION }}
           Section: utils
           Priority: optional
           Architecture: all
@@ -38,9 +44,9 @@ jobs:
 
           # Build the .deb package
           dpkg-deb --build bash-reminder
-          mv bash_reminder.deb bash-reminder_${{ github.ref_name }}.deb
+          mv bash_reminder.deb bash-reminder_v${{ env.VERSION }}.deb
 
       - name: Create GitHub Release with binary
         uses: softprops/action-gh-release@v2
         with:
-          files: bash_reminder.deb bash-reminder_${{ github.ref_name }}.deb
+          files: bash_reminder.deb bash-reminder_v${{ env.VERSION }}.deb
